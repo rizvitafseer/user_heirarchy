@@ -1,3 +1,3 @@
-= user_heirarchy
+user_heirarchy
 
 This plugin will stablish relation betwwen the roles and classify the tasks according to heirarchy
