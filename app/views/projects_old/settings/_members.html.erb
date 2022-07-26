@@ -1,0 +1,82 @@
+<%= stylesheet_link_tag 'chosen.min', :plugin => 'user_heirarchy' %>
+<style type="text/css">
+  .chosen-container{
+    width: 300px !important;
+  }
+</style>
+<% members = @project.memberships.preload(:project).sorted.to_a %>
+
+<% if User.current.admin? %>
+  <div class="contextual"><%= link_to l(:label_administration), users_path, :class => "icon icon-settings" %></div>
+<% end %>
+<p><%= link_to l(:label_member_new), new_project_membership_path(@project), :remote => true, :class => "icon icon-add" %></p>
+<% users_in_project = User.active.visible.sorted.member_of(@project) %>
+<% if members.any? %>
+<table class="list members">
+  <thead>
+    <tr>
+      <th><%= l(:label_user) %> / <%= l(:label_group) %></th>
+      <th><%= l(:label_role_plural) %></th>
+      <th>Report To</th>
+      <th>Reportees</th>
+      <th style="width:15%"></th>
+      <%= call_hook(:view_projects_settings_members_table_header, :project => @project) %>
+    </tr>
+  </thead>
+  <tbody>
+  <% members.each do |member| %>
+  <% next if member.new_record? %>
+  <tr id="member-<%= member.id %>">
+  <td class="name icon icon-<%= member.principal.class.name.downcase %>"><%= link_to_user member.principal %></td>
+  <td>
+    <span id="member-<%= member.id %>-roles"><%= member.roles.sort.collect(&:to_s).join(', ') %></span>
+    <div id="member-<%= member.id %>-form"></div>
+  </td>
+  <td>
+    <% report_to = UserHeirarchyRelation.where(project_id: member.project_id, reportee_id: member.user_id) %>
+    <% report_to.each do |rep_t| %>
+        <p><%= rep_t.user.name %></p>
+    <% end %>
+    <div id="member-report-<%= member.id %>" class="roles-selection" style="display: none;">
+    <%= form_for(member, :url => membership_path(member),
+                      :as => :membership,
+                      :remote => true,
+                      :method => :post) do |f| %>
+    <%= select_tag "reports_to", options_for_select(users_in_project.select{|u| u.id != member.user_id }.map{|u|  [u.name, u.id] }, report_to.map(&:user_id)), class: 'chosen', multiple: true %>
+    <input type="hidden"  name="project_id" value="<%= member.project_id %>">
+    <p>
+    <%= submit_tag l(:button_save) %>
+    <%= link_to_function l(:button_cancel),
+                         "$('#member-#{member.id}-roles').show(); $('#member-#{member.id}-form').empty(); $('#member-report-#{member.id}').hide(); return false;" %>
+  </p>
+    <% end %>
+  </div>
+  </td>
+  <td>
+    <% reportees = UserHeirarchyRelation.where(project_id: member.project_id, user_id: member.user_id) %>
+    <% reportees.each do |rep| %>
+        <p><%= rep.reportee.name %></p>
+    <% end %>
+  </td>
+  <td class="buttons">
+      <%= link_to l(:button_edit),
+                  edit_membership_path(member),
+                  :remote => true,
+                  :class => 'icon icon-edit' %>
+      <%= delete_link membership_path(member),
+                      :remote => true,
+                      :data => (!User.current.admin? && member.include?(User.current) ? {:confirm => l(:text_own_membership_delete_confirmation)} : {}) if member.deletable? %>
+  </td>
+  <%= call_hook(:view_projects_settings_members_table_row, { :project => @project, :member => member}) %>
+  </tr>
+<% end %>
+  </tbody>
+</table>
+<% else %>
+<p class="nodata"><%= l(:label_no_data) %></p>
+<% end %>
+<%= javascript_include_tag 'chosen.jquery.min', :plugin => 'user_heirarchy' %>
+
+<script type="text/javascript">
+  $(".chosen").chosen();
+</script>

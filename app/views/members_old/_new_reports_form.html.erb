@@ -1,0 +1,8 @@
+<fieldset class="box">
+  <legend><%= label_tag("reports_to_search", l(:label_principal_search)) %></legend>
+  <p><%= text_field_tag('reports_to_search', nil) %></p>
+  <%= javascript_tag "observeSearchfield('reports_to_search', 'reports_to_search_new_member', '#{ escape_javascript autocomplete_project_memberships_path(@project, :format => 'js') }')" %>
+  <div id="reports_to_search_new_member">
+    <%= render_reports_for_new_members(@project) %>
+  </div>
+</fieldset>

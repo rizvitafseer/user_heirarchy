@@ -1,0 +1,22 @@
+<fieldset class="box">
+  <legend><%= label_tag("principal_search", l(:label_principal_search)) %></legend>
+  <p><%= text_field_tag('principal_search', nil) %></p>
+  <%= javascript_tag "observeSearchfield('principal_search', null, '#{ escape_javascript autocomplete_project_memberships_path(@project, :format => 'js') }')" %>
+  <div id="principals_for_new_member">
+    <%= render_principals_for_new_members(@project) %>
+  </div>
+</fieldset>
+<fieldset class="box">
+  <legend>Reports To</legend>
+  <div class="roles-selection">
+    <%= select_tag "reports_to", options_for_select(User.active.visible.sorted.member_of(@project).map{|u| [u.name, u.id] }), class: 'chosen', multiple: true %>
+  </div>
+</fieldset>
+<fieldset class="box">
+  <legend><%= toggle_checkboxes_link('.roles-selection input') %><%= l(:label_role_plural) %></legend>
+  <div class="roles-selection">
+    <% User.current.managed_roles(@project).each do |role| %>
+      <label><%= check_box_tag 'membership[role_ids][]', role.id, false, :id => nil %> <%= role %></label>
+    <% end %>
+  </div>
+</fieldset>

@@ -1,0 +1,20 @@
+<%= stylesheet_link_tag 'chosen.min', :plugin => 'user_heirarchy' %>
+<style type="text/css">
+	.chosen-container{
+		width: 300px !important;
+	}
+</style>
+<h3 class="title"><%= l(:label_member_new) %></h3>
+
+<%= form_for @member, :as => :membership, :url => project_memberships_path(@project), :remote => true, :method => :post do |f| %>
+  <%= render :partial => 'new_form' %>
+  <p class="buttons">
+    <%= submit_tag l(:button_add), :id => 'member-add-submit' %>
+    <%= link_to_function l(:button_cancel), "hideModal(this);" %>
+  </p>
+<% end %>
+<%= javascript_include_tag 'chosen.jquery.min', :plugin => 'user_heirarchy' %>
+
+<script type="text/javascript">
+	$(".chosen").chosen();
+</script>

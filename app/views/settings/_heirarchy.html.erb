@@ -1,0 +1,23 @@
+<fieldset>
+	<legend>Heirarchy Report Settings</legend>
+  <% roles = Role.givable %>
+    <% roles.each do |r| %>
+    <% _r_val_ = Setting.plugin_user_heirarchy["heirarchy"].present? ? Setting.plugin_user_heirarchy["heirarchy_#{r.id}"] : '' %>
+  <p>
+    <label for="plunet_heirarchy_<%= r.id %>"><%= r.name %> reports to</label>
+    <%= select_tag "settings[heirarchy_#{r.id}",options_for_select(Role.givable.select{|role| role.id != r.id }.map{|ro| [ro.name, ro.id] }, _r_val_), include_blank: true %>
+  </p>
+  <% end %>
+</fieldset>
+
+
+<fieldset>
+  <legend>Heirarchy Priority Settings</legend>
+  <% roles = Role.givable %>
+    <% roles.each_with_index do |r,index| %>
+    <% _r_val = Setting.plugin_user_heirarchy["heirarchy"].present? ? Setting.plugin_user_heirarchy["heirarchy"][index] : '' %>
+  <p>
+    <%= select_tag "settings[heirarchy][]",options_for_select(Role.givable.map{|ro| [ro.name, ro.id] }, _r_val), include_blank: true %>
+  </p>
+  <% end %>
+</fieldset>
