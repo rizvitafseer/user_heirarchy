@@ -2,6 +2,7 @@ Redmine::Plugin.register :user_heirarchy do
   name 'User Heirarchy plugin'
   author 'Vignesh and Updated by Rizvi'
   description 'User Heirarchy plugin for Redmine'
+  url 'https://github.com/rizvitafseer/user_heirarchy'
   version '0.0.2'
 
   settings default: {}, partial: 'settings/heirarchy'
